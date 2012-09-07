@@ -20,7 +20,14 @@ def compose(f, g):
 class Popen(subprocess.Popen):
     registry = reaper.ProcessRegistry()
 
+    expected_exitcodes = {0}
+
     def __init__(self, command, *args, **kwargs):
+        try:
+            self.expected_exitcodes = kwargs.pop('expected_exitcodes')
+        except KeyError:
+            pass
+
         self.rusage = None
         self.exectime = None
         self.waittime = None
@@ -87,7 +94,9 @@ class Popen(subprocess.Popen):
                 pass
         return self.returncode
 
-    def check(self, expected_exitcodes={0}):
+    def check(self, expected_exitcodes=None):
+        if expected_exitcodes is None:
+            expected_exitcodes = self.expected_exitcodes
         retcode = self.wait()
         if retcode not in expected_exitcodes:
             raise subprocess.CalledProcessError(retcode, self.command)
