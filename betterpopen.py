@@ -41,6 +41,7 @@ class Popen(subprocess.Popen):
             command = shlex.split(command)
         else:
             self.commandstr = subprocess.list2cmdline(command)
+        self.command = command
 
         super(Popen, self).__init__(command, *args, **kwargs)
 
