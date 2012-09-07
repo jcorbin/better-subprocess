@@ -27,10 +27,11 @@ class Popen(subprocess.Popen):
     expected_exitcodes = {0}
 
     def __init__(self, command, *args, **kwargs):
-        try:
-            self.expected_exitcodes = kwargs.pop('expected_exitcodes')
-        except KeyError:
-            pass
+        for key in ('expected_exitcodes'):
+            try:
+                setattr(self, key, kwargs.pop(key))
+            except KeyError:
+                pass
 
         self.rusage = None
         self.exectime = None
