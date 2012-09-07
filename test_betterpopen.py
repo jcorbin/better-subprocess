@@ -60,5 +60,3 @@ def text_context():
             stderr=subprocess.PIPE) as proc:
         assert not len(proc.stdout.read())
         assert len(proc.stderr.read())
-
-text_context()
