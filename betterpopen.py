@@ -11,6 +11,9 @@ import subprocess
 
 import reaper
 
+import logging
+log = logging.getLogger(__name__)
+
 def compose(f, g):
     def h():
         f()
@@ -101,3 +104,15 @@ class Popen(subprocess.Popen):
         if retcode not in expected_exitcodes:
             raise subprocess.CalledProcessError(retcode, self.command)
         return retcode
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        retcode = self.wait()
+        if retcode not in self.expected_exitcodes:
+            err = subprocess.CalledProcessError(retcode, self.command)
+            if exc_type is None:
+                raise err
+            else:
+                log.error(str(err))

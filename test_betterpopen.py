@@ -34,3 +34,31 @@ def test_rlimits():
             resource.RLIMIT_CPU: (2, 2),
         }
     ).wait() == -signal.SIGKILL
+
+def text_context():
+    with Popen('ls /',
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE) as proc:
+        assert len(proc.stdout.read())
+        assert not len(proc.stderr.read())
+
+    try:
+        with Popen('ls /__path__/to/nowhere',
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE) as proc:
+            assert not len(proc.stdout.read())
+            assert len(proc.stderr.read())
+    except CalledProcessError:
+        pass
+    else:
+        assert False, "shoud've raised subprocess.CalledProcessError"
+
+
+    with Popen('ls /__path__/to/nowhere',
+            expected_exitcodes={2},
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE) as proc:
+        assert not len(proc.stdout.read())
+        assert len(proc.stderr.read())
+
+text_context()
