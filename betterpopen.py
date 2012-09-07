@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import collections
+import errno
 import os
 from Queue import Queue
 import resource
