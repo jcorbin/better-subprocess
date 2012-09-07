@@ -86,3 +86,9 @@ class Popen(subprocess.Popen):
             except KeyError:
                 pass
         return self.returncode
+
+    def check(self, expected_exitcodes={0}):
+        retcode = self.wait()
+        if retcode not in expected_exitcodes:
+            raise subprocess.CalledProcessError(retcode, self.command)
+        return retcode
