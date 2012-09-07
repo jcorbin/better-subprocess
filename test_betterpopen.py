@@ -35,7 +35,7 @@ def test_rlimits():
         }
     ).wait() == -signal.SIGKILL
 
-def text_context():
+def test_context():
     with Popen('ls /',
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE) as proc:
