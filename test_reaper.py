@@ -156,8 +156,3 @@ def test_sigcld():
 
     signal.signal(signal.SIGCLD, signal.SIG_DFL)
     Forked.registry.unhookup()
-
-test_reaper()
-test_registry()
-test_asyncreaper()
-test_sigcld()
