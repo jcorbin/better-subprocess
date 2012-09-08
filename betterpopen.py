@@ -160,9 +160,9 @@ class Popen(subprocess.Popen):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        retcode = self.wait()
-        if retcode not in self.expected_exitcodes:
-            err = subprocess.CalledProcessError(retcode, self.command)
+        self.wait()
+        if self.returncode not in self.expected_exitcodes:
+            err = subprocess.CalledProcessError(self.returncode, self.command)
             if exc_type is None:
                 raise err
             else:
