@@ -6,19 +6,7 @@ import signal
 import sys
 import time
 
-def fork_run(run, *args, **kwargs):
-    pid = os.fork()
-    if pid == 0:
-        run(*args, **kwargs)
-        sys.exit(255)
-    return pid
-
-from functools import wraps
-def forks(f):
-    @wraps(f)
-    def forker(*args, **kwargs):
-        return fork_run(f, *args, **kwargs)
-    return forker
+from test_util import forks
 
 @forks
 def fork_exit(exitstatus):
