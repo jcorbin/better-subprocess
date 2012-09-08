@@ -6,23 +6,20 @@ import time
 from obituary import obituary
 
 listeners = []
+reaped = {}
 theReaper = None
 
 class Reaper(object):
     def __init__(self, reap_pid=-1):
         self.reap_pid = reap_pid
-        self.reaped = {}
         global theReaper
-        if theReaper is not None:
-            self.reaped.update(theReaper.reaped)
-            theReaper.reaped = {}
         theReaper = self
 
     def dispatch(self, obit):
         for listener in listeners:
             r = listener(obit)
             if r is True:
-                del self.reaped[obit.pid]
+                del reaped[obit.pid]
                 break
 
     def reap(self, pid=None, wait=False):
@@ -30,7 +27,7 @@ class Reaper(object):
         waittime = time.time()
         pid, status, rusage = os.wait4(pid, 0 if wait else os.WNOHANG)
         if pid != 0:
-            self.reaped[pid] = obit = obituary(waittime, pid, status, rusage)
+            reaped[pid] = obit = obituary(waittime, pid, status, rusage)
             self.dispatch(obit)
         return pid
 
@@ -78,7 +75,7 @@ class ProcessRegistry(dict):
     def __setitem__(self, pid, proc):
         if self.reaper is not None:
             try:
-                obit = self.reaper.reaped[pid]
+                obit = reaped[pid]
             except KeyError:
                 pass
             else:

@@ -34,8 +34,8 @@ def test_reaper():
 
     pid = fork_exit(13)
     assert r.reap(pid, wait=True) == pid
-    assert pid in r.reaped
-    obit = r.reaped.pop(pid)
+    assert pid in reaper.reaped
+    obit = reaper.reaped.pop(pid)
     assert obit.exitstatus == 13
     assert obit.termsig is None
     assert obit.stopsig is None
@@ -43,8 +43,8 @@ def test_reaper():
 
     pid = fork_exit(12)
     assert r.reap(-1, wait=True) == pid
-    assert pid in r.reaped
-    obit = r.reaped.pop(pid)
+    assert pid in reaper.reaped
+    obit = reaper.reaped.pop(pid)
     assert obit.exitstatus == 12
     assert obit.termsig is None
     assert obit.stopsig is None
@@ -54,8 +54,8 @@ def test_reaper():
     assert r.reap(wait=False) == 0
     os.kill(pid, signal.SIGTERM)
     assert r.reap(wait=True) == pid
-    assert pid in r.reaped
-    obit = r.reaped.pop(pid)
+    assert pid in reaper.reaped
+    obit = reaper.reaped.pop(pid)
     assert obit.exitstatus is None
     assert obit.termsig is signal.SIGTERM
     assert obit.stopsig is None
