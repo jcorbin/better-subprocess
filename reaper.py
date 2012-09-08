@@ -53,16 +53,11 @@ class AsyncReaper(Reaper):
             super(AsyncReaper, self).dispatch(obit)
 
 class ProcessRegistry(dict):
-    reaper = None
-
     def hookup(self, reaper):
-        self.reaper = reaper
         listeners.append(self.dispatch)
 
     def unhookup(self):
-        if self.reaper is not None:
-            listeners.remove(self.dispatch)
-            del self.reaper
+        listeners.remove(self.dispatch)
 
     def dispatch(self, obit):
         try:
@@ -73,12 +68,11 @@ class ProcessRegistry(dict):
             proc._handle_obituary(obit)
 
     def __setitem__(self, pid, proc):
-        if self.reaper is not None:
-            try:
-                obit = reaped[pid]
-            except KeyError:
-                pass
-            else:
-                proc._handle_obituary(obit)
-                return
+        try:
+            obit = reaped[pid]
+        except KeyError:
+            pass
+        else:
+            proc._handle_obituary(obit)
+            return
         super(ProcessRegistry, self).__setitem__(pid, proc)
