@@ -128,6 +128,26 @@ class Popen(subprocess.Popen):
                 pass
         return self.returncode
 
+    def _internal_poll(self, _deadstate=None, _wait4=os.wait4,
+            _WNOHANG=os.WNOHANG, _os_error=os.error):
+        """Check if child process has terminated, possibly recording
+        resource usage.  Returns returncode attribute.
+
+        This method is called by __del__, so it cannot reference anything
+        outside of the local scope (nor can any methods it calls).
+
+        """
+        if self.returncode is None:
+            try:
+                pid, sts, rusage = _wait4(self.pid, _WNOHANG)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                    self.rusage = rusage
+            except _os_error:
+                if _deadstate is not None:
+                    self.returncode = _deadstate
+        return self.returncode
+
     def check(self, expected_exitcodes=None):
         if expected_exitcodes is None:
             expected_exitcodes = self.expected_exitcodes

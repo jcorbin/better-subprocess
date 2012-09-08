@@ -2,12 +2,26 @@ import os
 import resource
 import signal
 import subprocess
+import time
 
 from betterpopen import Popen, TEMPFILE
 
 def test_wait():
     proc = Popen('false')
     assert proc.wait() == 1
+    assert proc.rusage is not None
+
+def test_poll():
+    proc = Popen('gzip -c /dev/urandom', stdout=open('/dev/null', 'w'))
+    assert proc.rusage is None
+
+    assert proc.poll() is None
+    assert proc.rusage is None
+
+    time.sleep(.05)
+    proc.terminate()
+
+    assert proc.wait() == -signal.SIGTERM
     assert proc.rusage is not None
 
 def test_check():
