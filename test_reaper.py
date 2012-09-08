@@ -139,3 +139,8 @@ def test_sigcld():
                 i += 1
 
     signal.signal(signal.SIGCLD, signal.SIG_DFL)
+
+test_reaper()
+test_registry()
+test_asyncreaper()
+test_sigcld()
