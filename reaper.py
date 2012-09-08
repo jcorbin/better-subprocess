@@ -1,7 +1,6 @@
 import errno
 import os
 import Queue
-import signal
 import time
 
 from obituary import obituary
