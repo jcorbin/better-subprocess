@@ -40,8 +40,6 @@ class AsyncReaper(Reaper):
         super(AsyncReaper, self).__init__()
         self.dispatch = self.queue.put
 
-    #def dispatch(self, obit): self.queue.put(obit)
-
     def process_queue(self):
         while True:
             try:
