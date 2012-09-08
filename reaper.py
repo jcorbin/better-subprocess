@@ -13,6 +13,9 @@ class Reaper(object):
         self.reaped = {}
         self.listeners = []
         global theReaper
+        if theReaper is not None:
+            self.reaped.update(theReaper.reaped)
+            theReaper.reaped = {}
         theReaper = self
 
     def dispatch(self, obit):
