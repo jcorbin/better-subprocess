@@ -71,8 +71,6 @@ class ProcessRegistry(dict):
         try:
             obit = reaped[pid]
         except KeyError:
-            pass
+            super(ProcessRegistry, self).__setitem__(pid, proc)
         else:
             proc._handle_obituary(obit)
-            return
-        super(ProcessRegistry, self).__setitem__(pid, proc)
