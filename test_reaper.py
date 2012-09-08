@@ -42,6 +42,7 @@ class Forked(object):
 
 def test_reaper():
     r = reaper.Reaper()
+    assert r is reaper.theReaper
 
     pid = fork_exit(13)
     assert r.reap(pid, wait=True) == pid

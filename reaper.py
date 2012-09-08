@@ -5,11 +5,15 @@ import time
 
 from obituary import obituary
 
+theReaper = None
+
 class Reaper(object):
     def __init__(self, reap_pid=-1):
         self.reap_pid = reap_pid
         self.reaped = {}
         self.listeners = []
+        global theReaper
+        theReaper = self
 
     def dispatch(self, obit):
         for listener in self.listeners:
