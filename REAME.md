@@ -3,5 +3,6 @@ The idea is to add features to subprocess which I usually find lacking:
 * collect rusage data with os.wait4
 * easier and more flexible check-calling
 * support for reaping with SIGCLD
+* context management support
 * easy temporary file output
 
