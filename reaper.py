@@ -5,23 +5,21 @@ import time
 
 from obituary import obituary
 
+listeners = []
 theReaper = None
 
 class Reaper(object):
     def __init__(self, reap_pid=-1):
         self.reap_pid = reap_pid
         self.reaped = {}
-        self.listeners = []
         global theReaper
         if theReaper is not None:
             self.reaped.update(theReaper.reaped)
-            self.listeners.extend(theReaper.listeners)
             theReaper.reaped = {}
-            theReaper.listeners = []
         theReaper = self
 
     def dispatch(self, obit):
-        for listener in self.listeners:
+        for listener in listeners:
             r = listener(obit)
             if r is True:
                 del self.reaped[obit.pid]
@@ -62,11 +60,11 @@ class ProcessRegistry(dict):
 
     def hookup(self, reaper):
         self.reaper = reaper
-        self.reaper.listeners.append(self.dispatch)
+        listeners.append(self.dispatch)
 
     def unhookup(self):
         if self.reaper is not None:
-            self.reaper.listeners.remove(self.dispatch)
+            listeners.remove(self.dispatch)
             del self.reaper
 
     def dispatch(self, obit):

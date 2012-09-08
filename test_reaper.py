@@ -65,7 +65,7 @@ def test_reaper():
     def reap_listener(obit):
         got[obit.pid] = obit
         return True
-    r.listeners.append(reap_listener)
+    reaper.listeners.append(reap_listener)
 
     pid = fork_exit(0)
     assert r.reap(wait=True) == pid
@@ -76,6 +76,8 @@ def test_reaper():
     assert got.termsig is None
     assert got.stopsig is None
     assert got.coredump is False
+
+    reaper.listeners.remove(reap_listener)
 
 def test_registry():
     r = reaper.Reaper()
