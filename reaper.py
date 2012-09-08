@@ -5,6 +5,9 @@ import time
 
 from obituary import obituary
 
+import logging
+log = logging.getLogger(__name__)
+
 listeners = []
 reaped = {}
 theReaper = None
@@ -16,16 +19,17 @@ class Reaper(object):
         theReaper = self
 
     def dispatch(self, obit):
+        log.debug('dispatch ' + repr(obit))
         for listener in listeners:
             r = listener(obit)
             if r is True:
                 del reaped[obit.pid]
-                break
 
     def reap(self, pid=None, wait=False):
         if pid is None: pid = self.reap_pid
         waittime = time.time()
         pid, status, rusage = os.wait4(pid, 0 if wait else os.WNOHANG)
+        log.debug('wait4 => ' + repr((pid, status, rusage)))
         if pid != 0:
             reaped[pid] = obit = obituary(waittime, pid, status, rusage)
             self.dispatch(obit)
@@ -66,7 +70,7 @@ class ProcessRegistry(dict):
         except KeyError:
             return None
         else:
-            proc._handle_obituary(obit)
+            proc.handle_obituary(obit)
 
     def __setitem__(self, pid, proc):
         try:
@@ -74,4 +78,4 @@ class ProcessRegistry(dict):
         except KeyError:
             super(ProcessRegistry, self).__setitem__(pid, proc)
         else:
-            proc._handle_obituary(obit)
+            proc.handle_obituary(obit)
