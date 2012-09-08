@@ -9,6 +9,7 @@ import signal
 import time
 import shlex
 import subprocess
+import tempfile
 
 import reaper
 
@@ -21,13 +22,16 @@ def compose(f, g):
         g()
     return h
 
+TEMPFILE = -3
+
 class Popen(subprocess.Popen):
     registry = reaper.ProcessRegistry()
 
     expected_exitcodes = {0}
+    temp_maker = staticmethod(tempfile.mkstemp)
 
     def __init__(self, command, *args, **kwargs):
-        for key in ('expected_exitcodes'):
+        for key in ('expected_exitcodes', 'temp_maker'):
             try:
                 setattr(self, key, kwargs.pop(key))
             except KeyError:
@@ -56,6 +60,31 @@ class Popen(subprocess.Popen):
         self.command = command
 
         super(Popen, self).__init__(command, *args, **kwargs)
+
+    def _tempfile(self):
+        w, name = self.temp_maker()
+        r = os.open(name, os.O_RDONLY)
+        self._set_cloexec_flag(w)
+        # TODO: bufsize?
+        r = open(name, 'rU' if self.universal_newlines else 'rb', 0)
+        r = tempfile._TemporaryFileWrapper(r, name)
+        self._set_cloexec_flag(r.fileno())
+        return r, w
+
+    def _get_handles(self, stdin, stdout, stderr):
+        c2pwrite = errwrite = None
+
+        if stdout == TEMPFILE:
+            self.stdout, c2pwrite = self._tempfile()
+            stdout = None
+
+        if stderr == TEMPFILE:
+            self.stderr, errwrite = self._tempfile()
+            stderr = None
+
+        return tuple(ai if ai is not None else bi for ai, bi in zip(
+                (None, None, None, c2pwrite, None, errwrite),
+                super(Popen, self)._get_handles(stdin, stdout, stderr)))
 
     def _execute_child(self, *args):
         self.exectime = time.time()
