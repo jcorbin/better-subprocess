@@ -53,10 +53,11 @@ class AsyncReaper(Reaper):
             super(AsyncReaper, self).dispatch(obit)
 
 class ProcessRegistry(dict):
-    def hookup(self, reaper):
+    def __init__(self, *args, **kwargs):
         listeners.append(self.dispatch)
+        super(ProcessRegistry, self).__init__(*args, **kwargs)
 
-    def unhookup(self):
+    def __del__(self):
         listeners.remove(self.dispatch)
 
     def dispatch(self, obit):

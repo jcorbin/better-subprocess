@@ -81,7 +81,6 @@ def test_reaper():
 
 def test_registry():
     r = reaper.Reaper()
-    Forked.registry.hookup(r)
 
     f = Forked(fork_exit(0))
     assert r.reap(wait=True) == f.pid
@@ -92,11 +91,8 @@ def test_registry():
     assert f.obit.stopsig is None
     assert f.obit.coredump is False
 
-    Forked.registry.unhookup()
-
 def test_asyncreaper():
     r = reaper.AsyncReaper()
-    Forked.registry.hookup(r)
 
     f = Forked(fork_exit(0))
     assert r.reap(wait=True) == f.pid
@@ -112,8 +108,6 @@ def test_asyncreaper():
     assert f.obit.stopsig is None
     assert f.obit.coredump is False
 
-    Forked.registry.unhookup()
-
 class DelayedExitFork(Forked):
     def __init__(self, expectedstatus, delay):
         self.delay = delay
@@ -127,7 +121,6 @@ class DelayedExitFork(Forked):
 
 def test_sigcld():
     r = reaper.Reaper()
-    Forked.registry.hookup(r)
     signal.signal(signal.SIGCLD, r.handle_sigcld)
 
     waiting = [DelayedExitFork(i, (i % 32) / 32) for i in range(256)]
@@ -146,4 +139,3 @@ def test_sigcld():
                 i += 1
 
     signal.signal(signal.SIGCLD, signal.SIG_DFL)
-    Forked.registry.unhookup()
