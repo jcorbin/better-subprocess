@@ -79,6 +79,8 @@ def test_reaper():
 
     reaper.listeners.remove(reap_listener)
 
+    reaper.theReaper = None
+
 def test_registry():
     r = reaper.Reaper()
 
@@ -90,6 +92,8 @@ def test_registry():
     assert f.obit.termsig is None
     assert f.obit.stopsig is None
     assert f.obit.coredump is False
+
+    reaper.theReaper = None
 
 def test_asyncreaper():
     r = reaper.AsyncReaper()
@@ -107,6 +111,8 @@ def test_asyncreaper():
     assert f.obit.termsig is None
     assert f.obit.stopsig is None
     assert f.obit.coredump is False
+
+    reaper.theReaper = None
 
 class DelayedExitFork(Forked):
     def __init__(self, expectedstatus, delay):
@@ -139,3 +145,5 @@ def test_sigchld():
                 i += 1
 
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+
+    reaper.theReaper = None
