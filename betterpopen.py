@@ -91,7 +91,7 @@ class Popen(subprocess.Popen):
         super(Popen, self)._execute_child(*args)
         self.registry[self.pid] = self
 
-    def _handle_obituary(self, obit):
+    def handle_obituary(self, obit):
         assert obit.pid == self.pid
         self.waittime = obit.waittime
         self.rusage = obit.rusage

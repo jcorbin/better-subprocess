@@ -66,7 +66,7 @@ class ProcessRegistry(dict):
         except KeyError:
             return None
         else:
-            proc._handle_obituary(obit)
+            proc.handle_obituary(obit)
 
     def __setitem__(self, pid, proc):
         try:
@@ -74,4 +74,4 @@ class ProcessRegistry(dict):
         except KeyError:
             super(ProcessRegistry, self).__setitem__(pid, proc)
         else:
-            proc._handle_obituary(obit)
+            proc.handle_obituary(obit)

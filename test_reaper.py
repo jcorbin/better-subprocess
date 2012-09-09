@@ -25,7 +25,7 @@ class Forked(object):
         self.pid = forked_pid
         self.registry[self.pid] = self
 
-    def _handle_obituary(self, obit):
+    def handle_obituary(self, obit):
         self.obit = obit
 
 def test_reaper():
