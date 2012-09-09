@@ -1,6 +1,7 @@
 import errno
 import os
 import Queue
+import signal
 import time
 
 from obituary import obituary
@@ -16,6 +17,8 @@ class Reaper(object):
     def __init__(self, reap_pid=-1):
         self.reap_pid = reap_pid
         global theReaper
+        if theReaper is not None:
+            theReaper.unhookup_sigchld()
         theReaper = self
 
     def dispatch(self, obit):
@@ -34,6 +37,27 @@ class Reaper(object):
             reaped[pid] = obit = obituary(waittime, pid, status, rusage)
             self.dispatch(obit)
         return pid
+
+    old_sigchld = None
+
+    def hookup_sigchld(self):
+        self.old_sigchld = signal.signal(signal.SIGCHLD, self.handle_sigchld)
+
+    def unhookup_sigchld(self):
+        handler = signal.getsignal(signal.SIGCHLD)
+        if handler == self.handle_sigchld:
+            # N.B. ABA problem, but shouldn't matter really
+            if self.old_sigchld is None:
+                log.warning("no old_sigchld set, setting SIGCHLD to SIG_DFL")
+                signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+            else:
+                signal.signal(signal.SIGCHLD, self.old_sigchld)
+                log.debug('unhookup {0} from SIGCHLD'.format(handler))
+            del self.old_sigchld
+        elif self.old_sigchld is not None:
+            log.warning(
+                'old_sigchld is not None, but current handler is {0} not {1}'
+                .format(handler, self.handle_sigchld))
 
     def handle_sigchld(self, signum, frame):
         log.debug('{0} handling SIGCHLD'.format(self.__class__.__name__))

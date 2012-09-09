@@ -127,7 +127,11 @@ class DelayedExitFork(Forked):
 
 def test_sigchld():
     r = reaper.Reaper()
-    signal.signal(signal.SIGCHLD, r.handle_sigchld)
+    old_sigchld = signal.getsignal(signal.SIGCHLD)
+    r.hookup_sigchld()
+    assert r.old_sigchld is old_sigchld
+    assert signal.getsignal(signal.SIGCHLD) == reaper.theReaper.handle_sigchld
+    del r
 
     waiting = [DelayedExitFork(i, (i % 32) / 32) for i in range(256)]
     while waiting:
@@ -144,6 +148,7 @@ def test_sigchld():
             else:
                 i += 1
 
-    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+    reaper.theReaper.unhookup_sigchld()
+    assert signal.getsignal(signal.SIGCHLD) is old_sigchld
 
     reaper.theReaper = None
