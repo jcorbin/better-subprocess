@@ -20,7 +20,6 @@ class Reaper(object):
             r = listener(obit)
             if r is True:
                 del reaped[obit.pid]
-                break
 
     def reap(self, pid=None, wait=False):
         if pid is None: pid = self.reap_pid
