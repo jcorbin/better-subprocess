@@ -30,7 +30,7 @@ class Reaper(object):
             self.dispatch(obit)
         return pid
 
-    def handle_sigcld(self, signum, frame):
+    def handle_sigchld(self, signum, frame):
         try:
             while self.reap() != 0:
                 pass

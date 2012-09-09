@@ -25,7 +25,7 @@ def forks(f):
 def kill_pids():
     global Outstanding
     pids = Outstanding[os.getpid()]
-    signal.signal(signal.SIGCLD, signal.SIG_DFL)
+    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
     killed = set()
     for pid in pids:
         try:

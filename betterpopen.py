@@ -114,7 +114,7 @@ class Popen(subprocess.Popen):
                     if self.returncode is not None:
                         sts = None
                 elif e.errno != errno.ECHILD:
-                    # This happens if SIGCLD is set to be ignored or waiting
+                    # This happens if SIGCHLD is set to be ignored or waiting
                     # for child processes has otherwise been disabled for our
                     # process.  This child is dead, we can't get the status.
                     sts = 0
