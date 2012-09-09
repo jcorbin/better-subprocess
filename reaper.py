@@ -32,8 +32,9 @@ class Reaper(object):
 
     def handle_sigchld(self, signum, frame):
         try:
-            while self.reap() != 0:
-                pass
+            while True:
+                pid = self.reap()
+                if pid == 0: break
         except OSError as err:
             if err.errno != errno.ECHILD: raise
 
