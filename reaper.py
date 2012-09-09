@@ -5,6 +5,9 @@ import time
 
 from obituary import obituary
 
+import logging
+log = logging.getLogger(__name__)
+
 listeners = []
 reaped = {}
 theReaper = None
@@ -16,6 +19,7 @@ class Reaper(object):
         theReaper = self
 
     def dispatch(self, obit):
+        log.debug('dispatch ' + repr(obit))
         for listener in listeners:
             r = listener(obit)
             if r is True:
@@ -25,15 +29,19 @@ class Reaper(object):
         if pid is None: pid = self.reap_pid
         waittime = time.time()
         pid, status, rusage = os.wait4(pid, 0 if wait else os.WNOHANG)
+        log.debug('wait4 => ' + repr((pid, status, rusage)))
         if pid != 0:
             reaped[pid] = obit = obituary(waittime, pid, status, rusage)
             self.dispatch(obit)
         return pid
 
     def handle_sigchld(self, signum, frame):
+        log.debug('{0} handling SIGCHLD'.format(self.__class__.__name__))
         try:
             while True:
                 pid = self.reap()
+                log.debug('{0} SIGCHLD reaped pid {1}'
+                    .format(self.__class__.__name__, pid))
                 if pid == 0: break
         except OSError as err:
             if err.errno != errno.ECHILD: raise
