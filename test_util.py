@@ -4,6 +4,12 @@ import signal
 import sys
 from functools import wraps
 
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    datefmt='%FT%T', # YYYY-MM-DDTHH:MM:SS
+    format='%(asctime)s.%(msecs)d [%(process)d.%(thread)d] %(name)s %(levelname)s %(message)s')
+
 from collections import defaultdict
 Outstanding = defaultdict(lambda: [])
 
