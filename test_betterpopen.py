@@ -63,7 +63,7 @@ def test_context():
                 stderr=subprocess.PIPE) as proc:
             assert not len(proc.stdout.read())
             assert len(proc.stderr.read())
-    except CalledProcessError:
+    except subprocess.CalledProcessError:
         pass
     else:
         assert False, "shoud've raised subprocess.CalledProcessError"
