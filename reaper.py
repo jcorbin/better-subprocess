@@ -21,6 +21,12 @@ class Reaper(object):
             theReaper.unhookup_sigchld()
         theReaper = self
 
+    def __enter__(self):
+        self.hookup_sigchld()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.unhookup_sigchld()
+
     def dispatch(self, obit):
         log.debug('dispatch ' + repr(obit))
         for listener in listeners:
